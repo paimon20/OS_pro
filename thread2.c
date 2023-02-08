@@ -1,22 +1,30 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#include<stdio.h>
+#include<pthread.h>
+#include<unistd.h>
 
-int main(void)
+void *test();
+
+int main()
 {
-    pid_t pid1 = fork();
-    if (pid1 == 0) {
-        for (int i = 1; i <= 100; i++)
-            printf("Child 1: %d\n", i);
-        return 0;
-    }
-    pid_t pid2 = fork();
-    if (pid2 == 0) {
-        for (int i = 100; i >= 1; i--)
-            printf("Child 2: %d\n", i);
-        return 0;
-    }
-    waitpid(pid1, NULL, 0);
-    waitpid(pid2, NULL, 0);
-    return 0;
+	pthread_t tid;
+	pthread_attr_t attr;
+	pthread_attr_init( &attr );
+	
+	pthread_create( &tid, &attr, test, NULL);
+	pthread_join(tid, NULL);
+	
+	printf("Exiting main thread\n");
+	return 0;
+}
+
+
+void *test()
+{
+	int i;
+	for(i=0; i<10; i++)
+	{
+		sleep(1);
+		printf("thread(1) i=%d\n", i);
+	}
+	pthread_exit(NULL);
 }
